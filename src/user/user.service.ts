@@ -5,21 +5,25 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
+import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository<User>
-  ) { }
+    private userRepository: Repository<User>,
+  ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
-      const password = await bcrypt.hash(createUserDto.password, process.env.BCRYPT_SALT_ROUNDS);
+      const password = await bcrypt.hash(
+        createUserDto.password,
+        +process.env.BCRYPT_SALT_ROUNDS,
+      );
 
       const user = this.userRepository.create({ ...createUserDto, password });
       await this.userRepository.save(user);
-      
+
       return user;
     } catch (error) {
       console.error('Error creating user:', error);
@@ -35,7 +39,7 @@ export class UserService {
     try {
       const user = await this.userRepository.findOne({ where: { username } });
       if (!user) {
-        throw new Error('User not found');
+        return null;
       }
       return user;
     } catch (error) {
@@ -44,11 +48,42 @@ export class UserService {
     }
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(username: string, updateUserDto: UpdateUserDto) {
+    try {
+      const result = await this.userRepository.update(
+        { username },
+        updateUserDto,
+      );
+
+      return result;
+    } catch (err) {
+      console.error('Error updating user:', err);
+      throw new Error('Failed to update user');
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async updateUserRole(updateUserRoleDto: UpdateUserRoleDto) {
+    try {
+      const result = await this.userRepository.update(
+        { username: updateUserRoleDto.username },
+        { role: updateUserRoleDto.role },
+      );
+
+      return result;
+    } catch (err) {
+      console.error('Error updating user role:', err);
+      throw new Error('Failed to update user role');
+    }
+  }
+
+  async remove(username: string) {
+    try {
+      const result = await this.userRepository.delete({ username });
+
+      return result;
+    } catch (err) {
+      console.error('Error removing user:', err);
+      throw new Error('Failed to remove user');
+    }
   }
 }

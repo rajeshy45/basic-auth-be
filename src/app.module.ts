@@ -8,9 +8,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user/entities/user.entity';
 
 @Module({
-  imports: [ConfigModule.forRoot(),
-  TypeOrmModule.forRoot(
-    {
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
       port: +process.env.DB_PORT,
@@ -19,10 +21,11 @@ import { User } from './user/entities/user.entity';
       database: process.env.DB_NAME,
       entities: [User],
       synchronize: true,
-    }
-  ),
-    UserModule, AuthModule],
+    }),
+    UserModule,
+    AuthModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

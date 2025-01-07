@@ -25,13 +25,19 @@ This project is a backend application built with NestJS that supports basic auth
    npm install
    ```
 
-3. Create a 
-
-.env
-
- file in the root directory and add the following environment variables:
+3. Create a **.env** file in the root directory and add the following environment variables:
 
    ```env
+   DB_HOST=localhost
+   DB_PORT=5432
+   DB_NAME=firewall
+   DB_USER=admin
+   DB_PASS=admin
+   
+   BCRYPT_SALT_ROUNDS=10
+   
+   JWT_SECRET=a_strong_secret
+
    OIDC_ISSUER=https://accounts.google.com
    OIDC_AUTHORIZATION_URL=https://accounts.google.com/o/oauth2/v2/auth
    OIDC_TOKEN_URL=https://oauth2.googleapis.com/token
@@ -75,5 +81,4 @@ curl -X POST http://localhost:3000/auth/login -H "Content-Type: application/json
 
 This project is licensed under the MIT License.
 
-Make sure to replace `your-google-client-id` and `your-google-client-secret` with your actual Google OAuth 2.0 credentials. You can also customize the README further based on your project's specific requirements and features.
 Make sure to replace `your-google-client-id` and `your-google-client-secret` with your actual Google OAuth 2.0 credentials. You can also customize the README further based on your project's specific requirements and features.

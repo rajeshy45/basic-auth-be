@@ -18,7 +18,7 @@ export class AuthService {
 
   async login(loginDto: LoginDto): Promise<{ token: string }> {
     try {
-      const user = await this.userService.findOne(loginDto.username);
+      const user = await this.userService.findOne(loginDto.email);
 
       if (user) {
         const isMatch = await bcrypt.compare(loginDto.password, user.password);
@@ -26,7 +26,7 @@ export class AuthService {
           return {
             token: await this.jwtService.signAsync({
               sub: user.id,
-              username: user.username,
+              email: user.email,
               role: user.role,
             }),
           };
@@ -49,14 +49,14 @@ export class AuthService {
 
   async register(registerDto: RegisterDto): Promise<{ token: string }> {
     try {
-      const user = await this.userService.findOne(registerDto.username);
+      const user = await this.userService.findOne(registerDto.email);
 
       if (!user) {
         const user = await this.userService.create(registerDto);
         return {
           token: await this.jwtService.signAsync({
             sub: user.id,
-            username: user.username,
+            email: user.email,
             role: user.role,
           }),
         };
@@ -73,11 +73,32 @@ export class AuthService {
     }
   }
 
-  async loginWithOIDC(user: any) {
-    console.log(user);
-    const payload = { username: user.username, sub: user.oidcId, role: user.role };
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
+  async loginWithOIDC(profile: any) {
+    try {
+      const email = profile.email;
+
+      const user = await this.userService.findOne(email);
+
+      if (!user) {
+        throw new BadRequestException('User not found. Please register.');
+      }
+
+      const payload = {
+        email: user.email,
+        sub: user.id,
+        role: user.role,
+      };
+      return {
+        token: this.jwtService.sign(payload),
+      };
+    } catch (err) {
+      console.error('Error while login with OIDC: ' + err);
+
+      if (err.response.statusCode) {
+        throw err;
+      }
+
+      throw new Error('Failed to login with OIDC');
+    }
   }
 }

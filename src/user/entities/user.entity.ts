@@ -19,7 +19,7 @@ export class User {
   last_name: string;
 
   @Column({ unique: true })
-  username: string;
+  email: string;
 
   @Column()
   password: string;

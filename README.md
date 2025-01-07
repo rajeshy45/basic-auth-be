@@ -58,7 +58,7 @@ This project is a backend application built with NestJS that supports basic auth
 ### Endpoints
 
 - `POST /auth/register`: Register a new user
-- `POST /auth/login`: Login with username and password
+- `POST /auth/login`: Login with email and password
 - `GET /auth/oidc`: Initiate OIDC login with Google
 - `GET /auth/oidc/callback`: OIDC callback endpoint
 - `GET /auth/logout`: Logout the user
@@ -68,13 +68,13 @@ This project is a backend application built with NestJS that supports basic auth
 #### Register
 
 ```sh
-curl -X POST http://localhost:3000/auth/register -H "Content-Type: application/json" -d '{"username": "testuser", "password": "testpass"}'
+curl -X POST http://localhost:3000/auth/register -H "Content-Type: application/json" -d '{"email": "testuser@test.com", "password": "testpass"}'
 ```
 
 #### Login
 
 ```sh
-curl -X POST http://localhost:3000/auth/login -H "Content-Type: application/json" -d '{"username": "testuser", "password": "testpass"}'
+curl -X POST http://localhost:3000/auth/login -H "Content-Type: application/json" -d '{"email": "testuser@test.com", "password": "testpass"}'
 ```
 
 ## License

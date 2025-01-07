@@ -23,14 +23,14 @@ export class UserController {
 
   @Get()
   getLoggedInUser(@Req() req: any) {
-    const username = req.user.username;
+    const email = req.user.email;
 
-    return this.userService.findOne(username);
+    return this.userService.findOne(email);
   }
 
   @Put()
   update(@Req() req: any, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(req.user.username, updateUserDto);
+    return this.userService.update(req.user.email, updateUserDto);
   }
 
   @Put('role')
@@ -40,7 +40,7 @@ export class UserController {
     @Req() req: any,
     @Body() updateUserRoleDto: UpdateUserRoleDto,
   ) {
-    if (req.user.username === updateUserRoleDto.username) {
+    if (req.user.email === updateUserRoleDto.email) {
       throw new BadRequestException('You cannot change your own role');
     }
 
@@ -51,11 +51,11 @@ export class UserController {
   // @UseGuards(RolesGuard)
   // @Roles(UserRole.ADMIN)
   // updateOidcConfig(@Body() updateOidcConfigDto: UpdateOidcConfigDto) {
-  //   return this.userService.updateOidcConfig(updateOidcConfigDto.username, updateOidcConfigDto);
+  //   return this.userService.updateOidcConfig(updateOidcConfigDto.email, updateOidcConfigDto);
   // }
 
   @Delete()
   remove(@Req() req: any) {
-    return this.userService.remove(req.user.username);
+    return this.userService.remove(req.user.email);
   }
 }

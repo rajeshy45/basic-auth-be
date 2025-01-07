@@ -35,9 +35,9 @@ export class UserService {
     return `This action returns all user`;
   }
 
-  async findOne(username: string): Promise<User> {
+  async findOne(email: string): Promise<User> {
     try {
-      const user = await this.userRepository.findOne({ where: { username } });
+      const user = await this.userRepository.findOne({ where: { email } });
       if (!user) {
         return null;
       }
@@ -48,12 +48,9 @@ export class UserService {
     }
   }
 
-  async update(username: string, updateUserDto: UpdateUserDto) {
+  async update(email: string, updateUserDto: UpdateUserDto) {
     try {
-      const result = await this.userRepository.update(
-        { username },
-        updateUserDto,
-      );
+      const result = await this.userRepository.update({ email }, updateUserDto);
 
       return result;
     } catch (err) {
@@ -65,7 +62,7 @@ export class UserService {
   async updateUserRole(updateUserRoleDto: UpdateUserRoleDto) {
     try {
       const result = await this.userRepository.update(
-        { username: updateUserRoleDto.username },
+        { email: updateUserRoleDto.email },
         { role: updateUserRoleDto.role },
       );
 
@@ -76,9 +73,9 @@ export class UserService {
     }
   }
 
-  async remove(username: string) {
+  async remove(email: string) {
     try {
-      const result = await this.userRepository.delete({ username });
+      const result = await this.userRepository.delete({ email });
 
       return result;
     } catch (err) {

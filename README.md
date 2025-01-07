@@ -15,7 +15,7 @@ This project is a backend application built with NestJS that supports basic auth
 1. Clone the repository:
 
    ```sh
-   git clone https://github.com/your-username/basic-auth-be.git
+   git clone https://github.com/rajeshy45/basic-auth-be.git
    cd basic-auth-be
    ```
 

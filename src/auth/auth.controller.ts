@@ -1,4 +1,12 @@
-import { Controller, Post, Body, Get, UseGuards, Req, Res } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  UseGuards,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -20,14 +28,14 @@ export class AuthController {
 
   @Get('oidc')
   @UseGuards(AuthGuard('oidc'))
-  async oidcLogin() {
+  async oidcLogin(@Req() req: any) {
     // The guard will redirect to OIDC provider
   }
 
   @Get('oidc/callback')
-  @UseGuards(AuthGuard('oidc'))
   async oidcCallback(@Req() req: any) {
-    const user = req.user;
-    return await this.authService.loginWithOIDC(user);
+    const { code, state } = req.query;
+
+    return await this.authService.loginWithOIDC(code);
   }
 }

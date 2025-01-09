@@ -8,6 +8,9 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import axios from 'axios';
+import * as querystring from 'querystring';
+import { UserRole } from 'src/common/enums/user-role.enum';
 
 @Injectable()
 export class AuthService {
@@ -73,23 +76,48 @@ export class AuthService {
     }
   }
 
-  async loginWithOIDC(profile: any) {
+  async loginWithOIDC(code: string) {
     try {
-      const email = profile.email;
+      const tokenResponse = await axios.post(
+        process.env.OIDC_TOKEN_URL,
+        querystring.stringify({
+          grant_type: 'authorization_code',
+          code: code,
+          redirect_uri: process.env.OIDC_CALLBACK_URL,
+          client_id: process.env.OIDC_CLIENT_ID,
+          client_secret: process.env.OIDC_CLIENT_SECRET,
+        }),
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        },
+      );
 
-      const user = await this.userService.findOne(email);
+      const { access_token } = tokenResponse.data;
 
+      const payload = this.jwtService.decode(access_token);
+      console.log(payload);
+
+      let user = await this.userService.findOne(payload.sub);
       if (!user) {
-        throw new BadRequestException('User not found. Please register.');
+        let role = payload.firewall_role;
+        if (!Object.values(UserRole).includes(role)) {
+          role = UserRole.READ_ONLY;
+        }
+
+        user = await this.userService.create(
+          { email: payload.sub, password: null, first_name: payload.first_name },
+          role,
+        );
       }
 
-      const payload = {
-        email: user.email,
-        sub: user.id,
-        role: user.role,
-      };
       return {
-        token: this.jwtService.sign(payload),
+        token: await this.jwtService.signAsync({
+          sub: user.id,
+          email: user.email,
+          role: user.role,
+        }),
       };
     } catch (err) {
       console.error('Error while login with OIDC: ' + err);

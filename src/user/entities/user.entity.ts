@@ -21,7 +21,7 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column()
+  @Column({ nullable: true })
   password: string;
 
   @Column({ type: 'enum', enum: UserRole, default: UserRole.READ_ONLY })

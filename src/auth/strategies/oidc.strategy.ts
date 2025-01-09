@@ -13,17 +13,24 @@ export class OidcStrategy extends PassportStrategy(Strategy, 'oidc') {
       clientID: process.env.OIDC_CLIENT_ID,
       clientSecret: process.env.OIDC_CLIENT_SECRET,
       callbackURL: process.env.OIDC_CALLBACK_URL,
-      scope: 'openid profile email',
+      scope: 'openid profile email'.split(' '),
     });
   }
 
   async validate(issuer: string, profile: any, done: Function) {
-    console.log({ issuer, profile });
-    const user = {
-      id: profile.id,
-      email: profile.emails[0].value,
-      name: profile.displayName,
-    };
-    done(null, user);
+    try {
+      const data = profile;
+
+      const user = {
+        id: data.sub,
+        email: data.email,
+        name: data.name,
+        firewallRole: data.firewall_role,
+      };
+
+      done(null, user);
+    } catch (error) {
+      done(error, false);
+    }
   }
 }

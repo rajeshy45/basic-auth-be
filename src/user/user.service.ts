@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
+import { UserRole } from 'src/common/enums/user-role.enum';
 
 @Injectable()
 export class UserService {
@@ -14,14 +15,17 @@ export class UserService {
     private userRepository: Repository<User>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: CreateUserDto, role?: UserRole): Promise<User> {
     try {
-      const password = await bcrypt.hash(
-        createUserDto.password,
-        +process.env.BCRYPT_SALT_ROUNDS,
-      );
+      let password = null;
+      if (createUserDto.password) {
+        password = await bcrypt.hash(
+          createUserDto.password,
+          +process.env.BCRYPT_SALT_ROUNDS,
+        );
+      }
 
-      const user = this.userRepository.create({ ...createUserDto, password });
+      const user = this.userRepository.create({ ...createUserDto, password, role });
       await this.userRepository.save(user);
 
       return user;
